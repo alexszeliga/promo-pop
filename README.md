@@ -12,5 +12,6 @@ A WordPress plugin allows content managers to create and display pop-up promotio
 # Technical Direction
 * This plugin is intended to provide a flexible UI for generating and displaying promos
 * This plugin is intended to allow for attachment to analytics
+* This plugin is intended to allow content managers to create and save multiple promos
 * This plugin is intended to allow for scheduled deployment of specific promos based on date
 * This plugin uses jQuery to generate the promo markup manipulate the DOM
