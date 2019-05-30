@@ -1,0 +1,10 @@
+input[type="text"], select {
+    width: 100%;
+}
+.promo-pop-wrap {
+    max-width: 960px;
+}
+
+select[multiple] {
+    height: 400px!important;
+} 
