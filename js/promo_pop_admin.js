@@ -23,35 +23,6 @@
     return false;
   });
 
-  // handler for selecting an option in the page selecter
-  $("body").on("mousedown", ".page-option", function(e) {
-    e.preventDefault();
-    var pageId = $(this).data("page-id");
-    // flip-flop the selected property
-    $(this).prop("selected", !$(this).prop("selected"));
-
-    // conditions for adding/removing from the saved list,
-    // the saved list is stored as a value on a hidden input
-    if ($(this).prop("selected")) {
-      var hiddenPages = $("#hidden-page-select").val();
-      if (hiddenPages === "") {
-        $("#hidden-page-select").val(pageId);
-      } else {
-        $("#hidden-page-select").val(hiddenPages + "," + pageId);
-      }
-    } else {
-      var hiddenPages = $("#hidden-page-select")
-        .val()
-        .split(",");
-
-      var filteredList = hiddenPages.filter(function(page) {
-        return parseInt(page) !== parseInt(pageId);
-      });
-      $("#hidden-page-select").val(filteredList.join());
-    }
-    return false;
-  });
-
   $(window).load(function() {
     var displayRuleRow = $('.promo_pop_page_array_type_row');
     var displayRuleSelectElement = displayRuleRow.find('select');
@@ -108,4 +79,21 @@
   }
   // init select2 on the multiselect:
   $('#promo_pop_field_page_array').select2();
+  $('#promo_pop_field_page_array').on('select2:select', function (e) {
+    var pageId = e.params.data.element.dataset.pageId;
+    var hiddenInput = $('#hidden-page-select');
+    if (hiddenInput.val().length === 0) {
+      hiddenInput.val(pageId);
+    } else if (hiddenInput.val().indexOf(pageId)<0) {
+      hiddenInput.val(hiddenInput.val()+","+pageId)
+    }
+    
+});
+$('#promo_pop_field_page_array').on('select2:unselect', function (e) {
+  var pageId = e.params.data.element.dataset.pageId;
+  var hiddenInput = $('#hidden-page-select');
+  var pageArray = hiddenInput.val().split(',');
+  pageArray.splice(pageArray.indexOf(pageId),1)
+  hiddenInput.val((pageArray).join(','));
+});
 })(jQuery);

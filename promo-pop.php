@@ -50,7 +50,7 @@ function promo_pop_settings_init() {
     wp_enqueue_style('select2_styles');
     wp_enqueue_style('promo_pop_admin_styles');
 
-    $promo_image_id = get_option( 'media_selector_attachment_id', 0 );
+    $promo_image_id[] = get_option( 'media_selector_attachment_id', 0 );
     wp_enqueue_media();
     wp_enqueue_script('select2',  plugin_dir_url(__FILE__) . 'js/lib/select2.full.min.js', array( 'jquery' ), '1.0.0', true );
     wp_enqueue_script('promo_pop_admin',  plugin_dir_url(__FILE__) . 'js/promo_pop_admin.js', array( 'jquery' ), '1.0.0', true );
@@ -186,7 +186,7 @@ function promo_pop_field_developer_mode_cb( $args ) {
     // output the field
     ?>
     <input type="checkbox" id="<?php echo esc_attr( $args['label_for'] ); ?>"
-    name="promo_pop_developer_mode" <?php if ($option["promo_pop_developer_mode"]) echo 'checked';?>>
+    name="promo_pop_developer_mode" <?php if ($option === 'on') echo 'checked';?>>
     <?php
 }
 // active field cb
@@ -196,7 +196,7 @@ function promo_pop_field_active_cb( $args ) {
  // output the field
  ?>
  <input type="checkbox" id="<?php echo esc_attr( $args['label_for'] ); ?>"
- name="promo_pop_active" <?php if ($option["promo_pop_field_active"]) echo 'checked';?>>
+ name="promo_pop_active" <?php if ($option === 'on') echo 'checked';?>>
  <?php
 }
 
