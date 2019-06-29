@@ -30,7 +30,8 @@
   var popDelay = 1000;
   var cookieState = Cookies.get("promo-pop-closed");
 
-  if ( (devMode && userLoggedIn && ((postsToFilter.indexOf(thisPostId) >= 0 && filterMethod === "include") ||
+  if (
+     (devMode && userLoggedIn && ((postsToFilter.indexOf(thisPostId) >= 0 && filterMethod === "include") ||
   (postsToFilter.indexOf(thisPostId) === -1 &&
     filterMethod === "exclude"))) ||
     (((postsToFilter.indexOf(thisPostId) >= 0 && filterMethod === "include") ||

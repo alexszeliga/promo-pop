@@ -45,12 +45,14 @@ function promo_pop_settings_init() {
         'public' => 'true',
     );
     $post_types = get_post_types( $post_types_args );
-
+    wp_register_style('select2_styles', plugin_dir_url(__FILE__) . 'css/lib/select2.min.css' );
     wp_register_style('promo_pop_admin_styles', plugin_dir_url(__FILE__) . 'css/promo_pop_admin_styles.css' );
+    wp_enqueue_style('select2_styles');
     wp_enqueue_style('promo_pop_admin_styles');
 
     $promo_image_id = get_option( 'media_selector_attachment_id', 0 );
     wp_enqueue_media();
+    wp_enqueue_script('select2',  plugin_dir_url(__FILE__) . 'js/lib/select2.full.min.js', array( 'jquery' ), '1.0.0', true );
     wp_enqueue_script('promo_pop_admin',  plugin_dir_url(__FILE__) . 'js/promo_pop_admin.js', array( 'jquery' ), '1.0.0', true );
     wp_localize_script('promo_pop_admin', 'pages', $page_ids_and_titles);
     wp_localize_script('promo_pop_admin', 'img_id', $promo_image_id);
