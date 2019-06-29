@@ -56,38 +56,79 @@ function promo_pop_settings_init() {
     wp_localize_script('promo_pop_admin', 'img_id', $promo_image_id);
     wp_localize_script('promo_pop_admin', 'post_types', $post_types);
 
-$promo_pop_field_name_array = array('active','title','body_image','cta_label','url','start','end','page_array','page_array_type');
+// $test = array('active','title','body_image','cta_label','url','start','end','page_array','page_array_type');
+$promo_pop_field_name_array = array(
+    array(
+        'name'  => 'active', 
+        'label' => 'Activate Promo'
+        ),
+    array(
+        'name'  => 'title',
+        'label' => 'Promo Title'
+        ),
+    array(
+        'name'  => 'body_image',
+        'label' => 'Background Image'
+        ),
+    array(
+        'name'  => 'cta_label',
+        'label' => 'Call to Action Text'
+        ),
+    array(
+        'name'  => 'url',
+        'label' => 'Promo URL'
+        ),
+    array(
+        'name'  => 'start',
+        'label' => ''
+        ),
+    array(
+        'name'  => 'end',
+        'label' => ''
+        ),
+    array(
+        'name'  => 'page_array_type',
+        'label' => 'Display Rule'
+        ),
+    array(
+        'name'  => 'page_array',
+        'label' => 'Display Pages'
+        ),
+    array(
+        'name'  => 'developer_mode',
+        'label' => 'Activate Developer Mode?'
+     ));
 
  // register settings for "promo_pop" page
 
  foreach ($promo_pop_field_name_array as $field_name) {
-    register_setting( 'promo_pop', 'promo_pop_' . $field_name );
+    register_setting( 'promo_pop', 'promo_pop_' . $field_name['name'] );
         // register a new field in the "promo_pop_section_developers" section, inside the "promo_pop" page
-    if ($field_name == "start") {
+    if ($field_name['name'] == "start") {
         add_settings_field(
-            'promo_pop_field_' . $field_name, // ID: used only internally
+            'promo_pop_field_' . $field_name['name'], // ID: used only internally
             // use $args' label_for to populate the id inside the callback
             'Promo Window', // Setting Label
-            'promo_pop_field_' . $field_name . '_cb', //function that returns HTML for form element
+            'promo_pop_field_' . $field_name['name'] . '_cb', //function that returns HTML for form element
             'promo_pop', // page slug string from 'add_menu_page' function
             'promo_pop_section_developers', // section from 'add_setting_section' function
                 [
-                    'label_for' => 'promo_pop_field_' . $field_name,
-                    'class' => 'promo_pop_row',
+                    'label_for' => 'promo_pop_field_' . $field_name['name'],
+                    'class' => 'promo_pop_' . $field_name['name'] . '_row',
                 ] // $args
             );
     }
-    elseif ($field_name != "end") {
+    elseif ($field_name['name'] != "end") {
     add_settings_field(
-        'promo_pop_field_' . $field_name, // ID: used only internally
+        'promo_pop_field_' . $field_name['name'], // ID: used only internally
         // use $args' label_for to populate the id inside the callback
-        'Promo ' . ucwords(str_replace("_", " ", $field_name)), // Setting Label
-        'promo_pop_field_' . $field_name . '_cb', //function that returns HTML for form element
+        $field_name['label'], // Setting Label
+        'promo_pop_field_' . $field_name['name'] . '_cb', //function that returns HTML for form element
         'promo_pop', // page slug string from 'add_menu_page' function
         'promo_pop_section_developers', // section from 'add_setting_section' function
             [
-                'label_for' => 'promo_pop_field_' . $field_name,
-                'class' => 'promo_pop_row',
+                'label_for' => 'promo_pop_field_' . $field_name['name'],
+                'class' => 'promo_pop_' . $field_name['name'] . '_row',
             ] // $args
         );
     }
@@ -135,6 +176,17 @@ function promo_pop_section_developers_cb( $args ) {
  <?php
 }
  
+
+//
+function promo_pop_field_developer_mode_cb( $args ) {
+    // get the value of the setting we've registered with register_setting()
+    $option = get_option( 'promo_pop_developer_mode' );
+    // output the field
+    ?>
+    <input type="checkbox" id="<?php echo esc_attr( $args['label_for'] ); ?>"
+    name="promo_pop_developer_mode" <?php if ($option["promo_pop_developer_mode"]) echo 'checked';?>>
+    <?php
+}
 // active field cb
 function promo_pop_field_active_cb( $args ) {
  // get the value of the setting we've registered with register_setting()
@@ -160,6 +212,7 @@ function promo_pop_field_body_image_cb( $args ) {
     <input name="promo_pop_body_image_button" type="button" id="<?php echo esc_attr( $args['label_for'] ); ?>" value="<?php _e("Upload Image"); ?>">
     <input name="promo_pop_body_remove_image_button" type="button" id="remove_<?php echo esc_attr( $args['label_for'] ); ?>" value="<?php _e("Remove Image"); ?>">
     <input type='hidden' name='promo_pop_body_image' id='image_attachment_id' value='<?php echo $option; ?>'>
+    <p>Recommended image size: 1024 x 350</p>
 
 
 <?php
@@ -222,11 +275,12 @@ function promo_pop_field_page_array_type_cb( $args ) {
 function promo_pop_options_page() {
  // add top level menu page
  add_menu_page(
- 'Promo Pop!',
- 'Promo Pop! Options',
+ 'Promotional Display',
+ 'Promotional Display',
  'manage_options',
  'promo_pop', //menu slug
- 'promo_pop_options_page_html'
+ 'promo_pop_options_page_html',
+ 'dashicons-megaphone'
  );
 }
  
@@ -287,6 +341,8 @@ function promo_pop_promo() {
     $options['now'] = strtotime('today');
     $options['page_array'] = get_option( 'promo_pop_page_array' );
     $options['page_array_type'] = get_option( 'promo_pop_page_array_type' );
+    $options['dev_mode'] = get_option( 'promo_pop_developer_mode');
+    $options['logged_in'] = is_user_logged_in();
     $detail['post_id'] = get_the_ID();
     $detail['plugin_dir'] = plugin_dir_url(__FILE__);
     wp_enqueue_script('promo_pop_frontend',  plugin_dir_url(__FILE__) . 'js/promo_pop_frontend.js', array( 'jquery' ), '1.0.0', true );
