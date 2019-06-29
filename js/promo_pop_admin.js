@@ -106,4 +106,6 @@
           return "Pages";
       }
   }
+  // init select2 on the multiselect:
+  $('#promo_pop_field_page_array').select2();
 })(jQuery);
