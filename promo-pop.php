@@ -29,11 +29,12 @@ function promo_pop_settings_init() {
     $page_ids = $page_query->posts;
     $page_ids_and_titles = array();
     // add home page to pages
-    $frontpage_id = get_option( 'page_on_front' );
-    $page_ids_and_titles[] = array(
-        'page_id'    => $frontpage_id,
-        'page_title' => get_the_title($frontpage_id),
-    );
+    if ( get_option( 'page_on_front' ) == 0) {
+        $page_ids_and_titles[] = array(
+            'page_id'    => 0,
+            'page_title' => 'Theme Homepage',
+        );
+    }
     foreach ($page_ids as $page_id) {
         $page_title = get_the_title($page_id);
         $page_ids_and_titles[] = array(
@@ -45,6 +46,11 @@ function promo_pop_settings_init() {
         'public' => 'true',
     );
     $post_types = get_post_types( $post_types_args );
+    $post_type_array = [];
+
+    foreach ($post_types as $post_type) {
+        $post_type_array[] = $post_type;
+    }
     wp_register_style('select2_styles', plugin_dir_url(__FILE__) . 'css/lib/select2.min.css' );
     wp_register_style('promo_pop_admin_styles', plugin_dir_url(__FILE__) . 'css/promo_pop_admin_styles.css' );
     wp_enqueue_style('select2_styles');
@@ -56,7 +62,7 @@ function promo_pop_settings_init() {
     wp_enqueue_script('promo_pop_admin',  plugin_dir_url(__FILE__) . 'js/promo_pop_admin.js', array( 'jquery' ), '1.0.0', true );
     wp_localize_script('promo_pop_admin', 'pages', $page_ids_and_titles);
     wp_localize_script('promo_pop_admin', 'img_id', $promo_image_id);
-    wp_localize_script('promo_pop_admin', 'post_types', $post_types);
+    wp_localize_script('promo_pop_admin', 'post_types', $post_type_array);
 
 // $test = array('active','title','body_image','cta_label','url','start','end','page_array','page_array_type');
 $promo_pop_field_name_array = array(
@@ -96,6 +102,10 @@ $promo_pop_field_name_array = array(
         'name'  => 'page_array',
         'label' => 'Display Pages'
         ),
+        array(
+            'name'  => 'post_type_array',
+            'label' => 'Display Post Types'
+            ),
     array(
         'name'  => 'developer_mode',
         'label' => 'Activate Developer Mode?'
@@ -252,6 +262,14 @@ function promo_pop_field_end_cb( $args ) {
 
 <?php
 }
+function promo_pop_field_page_array_type_cb( $args ) {
+    $option = get_option( 'promo_pop_page_array_type' );
+    ?>
+    <select name="promo_pop_page_array_type" id="<?php echo esc_attr( $args['label_for'] ); ?>">
+        <option  <?php if ($option == 'include') {echo 'selected'; } ?> value="include">Include Promo on Selected Pages</option>
+        <option  <?php if ($option == 'exclude') {echo 'selected'; } ?> value="exclude">Exclude Promo on Selected Pages</option>
+<?php
+}
 function promo_pop_field_page_array_cb( $args ) {
     $option = get_option( 'promo_pop_page_array' );
 
@@ -262,14 +280,17 @@ function promo_pop_field_page_array_cb( $args ) {
     </div>
 <?php
 }
-function promo_pop_field_page_array_type_cb( $args ) {
-    $option = get_option( 'promo_pop_page_array_type' );
+function promo_pop_field_post_type_array_cb( $args ) {
+    $option = get_option( 'promo_pop_post_type_array' );
+
     ?>
-    <select name="promo_pop_page_array_type" id="<?php echo esc_attr( $args['label_for'] ); ?>">
-        <option  <?php if ($option == 'include') {echo 'selected'; } ?> value="include">Include Promo on Selected Pages</option>
-        <option  <?php if ($option == 'exclude') {echo 'selected'; } ?> value="exclude">Exclude Promo on Selected Pages</option>
+    <select class="post-type-select" multiple="multiple" name="promo_pop_post_type_array_input" id="<?php echo esc_attr( $args['label_for'] ); ?>"></select>
+    <input type="hidden" id="hidden-post-type-select" name="promo_pop_post_type_array" value="<?php echo $option; ?>">
+    <div class="page-array-container">
+    </div>
 <?php
 }
+
  
 /**
  * top level menu
@@ -345,7 +366,7 @@ function promo_pop_promo() {
     $options['page_array_type'] = get_option( 'promo_pop_page_array_type' );
     $options['dev_mode'] = get_option( 'promo_pop_developer_mode');
     $options['logged_in'] = is_user_logged_in();
-    $detail['post_id'] = get_the_ID();
+    $detail['post'] = get_post(get_the_ID());
     $detail['plugin_dir'] = plugin_dir_url(__FILE__);
     wp_enqueue_script('promo_pop_frontend',  plugin_dir_url(__FILE__) . 'js/promo_pop_frontend.js', array( 'jquery' ), '1.0.0', true );
     wp_localize_script('promo_pop_frontend', 'options', $options);

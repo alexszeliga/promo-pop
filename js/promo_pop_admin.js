@@ -42,9 +42,36 @@
     // add page options to page select box using localized variable from WP enqueue
     var pageSelect = $(".page-select");
     var hiddenPages = $("#hidden-page-select")
-      .val()
-      .split(",");
+        .val()
+        .split(",");
+    var postSelect = $('.post-type-select');
+    var hiddenPostTypes = $("#hidden-post-type-select")
+        .val()
+        .split(",");
+
     // add a page option (and select it if it's in the array)
+    post_types.forEach(postType => {
+        console.log(postType);
+        if (hiddenPostTypes.indexOf(postType) !== -1) {
+            var postTypeOption = $(
+              '<option class="post-type-option" data-post-type-id="' +
+                postType +
+                '" selected>' +
+                postType +
+                "</option>"
+            );
+          } else {
+            var postTypeOption = $(
+              '<option class="post-type-option" data-post-type-id="' +
+                postType +
+                '">' +
+                postType +
+                "</option>"
+            );
+          }
+          postSelect.append(postTypeOption);
+
+    })
     pages.forEach(page => {
       if (hiddenPages.indexOf(page.page_id.toString()) !== -1) {
         var pageOption = $(
@@ -78,22 +105,41 @@
       }
   }
   // init select2 on the multiselect:
-  $('#promo_pop_field_page_array').select2();
-  $('#promo_pop_field_page_array').on('select2:select', function (e) {
-    var pageId = e.params.data.element.dataset.pageId;
-    var hiddenInput = $('#hidden-page-select');
-    if (hiddenInput.val().length === 0) {
-      hiddenInput.val(pageId);
-    } else if (hiddenInput.val().indexOf(pageId)<0) {
-      hiddenInput.val(hiddenInput.val()+","+pageId)
-    }
-    
-});
-$('#promo_pop_field_page_array').on('select2:unselect', function (e) {
-  var pageId = e.params.data.element.dataset.pageId;
-  var hiddenInput = $('#hidden-page-select');
-  var pageArray = hiddenInput.val().split(',');
-  pageArray.splice(pageArray.indexOf(pageId),1)
-  hiddenInput.val((pageArray).join(','));
-});
+    $("#promo_pop_field_page_array").select2();
+    $("#promo_pop_field_page_array").on("select2:select", function(e) {
+      var pageId = e.params.data.element.dataset.pageId;
+      var hiddenInput = $("#hidden-page-select");
+      if (hiddenInput.val().length === 0) {
+        hiddenInput.val(pageId);
+      } else if (hiddenInput.val().indexOf(pageId) < 0) {
+        hiddenInput.val(hiddenInput.val() + "," + pageId);
+      }
+    });
+    $("#promo_pop_field_page_array").on("select2:unselect", function(e) {
+      var pageId = e.params.data.element.dataset.pageId;
+      var hiddenInput = $("#hidden-page-select");
+      var pageArray = hiddenInput.val().split(",");
+      pageArray.splice(pageArray.indexOf(pageId), 1);
+      hiddenInput.val(pageArray.join(","));
+    });
+
+    $("#promo_pop_field_post_type_array").select2();
+    $("#promo_pop_field_post_type_array").on("select2:select", function(e) {
+        // console.log(e.params.data.element.dataset);
+      var pageId = e.params.data.element.dataset.postTypeId;
+      var hiddenInput = $("#hidden-post-type-select");
+      if (hiddenInput.val().length === 0) {
+        hiddenInput.val(pageId);
+      } else if (hiddenInput.val().indexOf(pageId) < 0) {
+        hiddenInput.val(hiddenInput.val() + "," + pageId);
+      }
+    });
+    $("#promo_pop_field_post_type_array").on("select2:unselect", function(e) {
+       console.log( e.params.data.element.dataset)
+      var pageId = e.params.data.element.dataset.postTypeId;
+      var hiddenInput = $("#hidden-post-type-select");
+      var pageArray = hiddenInput.val().split(",");
+      pageArray.splice(pageArray.indexOf(pageId), 1);
+      hiddenInput.val(pageArray.join(","));
+    });
 })(jQuery);
