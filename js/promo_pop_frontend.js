@@ -3,7 +3,9 @@
 // details contains all relevant post/page details.
 
 (function($) {
-  console.log(detail.post);
+  console.log(detail);
+  console.log(options);
+
 var now = parseInt(options.now);
 var start = parseInt(options.start);
 var end = parseInt(options.end);

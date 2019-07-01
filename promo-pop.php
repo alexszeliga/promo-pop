@@ -352,24 +352,102 @@ function promo_pop_options_page_html() {
 }
 
 function promo_pop_promo() {
-    wp_enqueue_script('jcookie',  plugin_dir_url(__FILE__) . 'js/lib/jquery.cookie.js', array( 'jquery' ), '1.0.0', true );
-    wp_enqueue_style( 'promo_pop_styles', plugin_dir_url(__FILE__) . 'css/promo_pop_styles.css', array(), '1.0.0' );
-    $options['active'] = get_option( 'promo_pop_active' );
-    $options['title'] = get_option( 'promo_pop_title' );
-    $options['body_image'] = wp_get_attachment_url( get_option( 'promo_pop_body_image' ) );
-    $options['cta_label'] = get_option( 'promo_pop_cta_label' );
-    $options['url'] = get_option( 'promo_pop_url' );
-    $options['start'] = strtotime( get_option( 'promo_pop_start' ) );
-    $options['end'] = strtotime( get_option( 'promo_pop_end' ) );
-    $options['now'] = strtotime('today');
-    $options['page_array'] = get_option( 'promo_pop_page_array' );
-    $options['page_array_type'] = get_option( 'promo_pop_page_array_type' );
-    $options['dev_mode'] = get_option( 'promo_pop_developer_mode');
-    $options['logged_in'] = is_user_logged_in();
-    $detail['post'] = get_post(get_the_ID());
-    $detail['plugin_dir'] = plugin_dir_url(__FILE__);
-    wp_enqueue_script('promo_pop_frontend',  plugin_dir_url(__FILE__) . 'js/promo_pop_frontend.js', array( 'jquery' ), '1.0.0', true );
-    wp_localize_script('promo_pop_frontend', 'options', $options);
-    wp_localize_script('promo_pop_frontend', 'detail', $detail);
+    // main function call: enqueue's js which attaches markup to body using jQuery
+    if ( promo_pop_post_show_promo() ) {
+
+        // init variables to send to front-end js code
+        global $post;
+        $options['active'] = get_option( 'promo_pop_active' );
+        $options['title'] = get_option( 'promo_pop_title' );
+        $options['body_image'] = wp_get_attachment_url( get_option( 'promo_pop_body_image' ) );
+        $options['cta_label'] = get_option( 'promo_pop_cta_label' );
+        $options['url'] = get_option( 'promo_pop_url' );
+        $options['start'] = strtotime( get_option( 'promo_pop_start' ) );
+        $options['end'] = strtotime( get_option( 'promo_pop_end' ) );
+        $options['now'] = strtotime('today');
+        $options['page_array'] = get_option( 'promo_pop_page_array' );
+        $options['post_type_array'] = get_option( 'promo_pop_post_type_array' );
+        $options['page_array_type'] = get_option( 'promo_pop_page_array_type' );
+        $options['dev_mode'] = get_option( 'promo_pop_developer_mode');
+        $options['logged_in'] = is_user_logged_in();
+        $detail['post'] = $post;
+        $detail['plugin_dir'] = plugin_dir_url(__FILE__);
+
+        // enqueue and localize jQuery cookie library and frontend js with localized variables
+        wp_enqueue_script('jcookie',  plugin_dir_url(__FILE__) . 'js/lib/jquery.cookie.js', array( 'jquery' ), '1.0.0', true );
+        wp_enqueue_script('promo_pop_frontend',  plugin_dir_url(__FILE__) . 'js/promo_pop_frontend.js', array( 'jquery' ), '1.0.0', true );
+        wp_localize_script('promo_pop_frontend', 'options', $options);
+        wp_localize_script('promo_pop_frontend', 'detail', $detail);
+
+        // enqueue promo stylesheet
+        // TODO: Strip Munroe customizations.
+        wp_enqueue_style( 'promo_pop_styles', plugin_dir_url(__FILE__) . 'css/promo_pop_styles.css', array(), '1.0.0' );
+    }
 }
+
+function promo_pop_post_show_promo() {
+    $promo_start = strtotime( get_option( 'promo_pop_start' ) );
+    $promo_end = strtotime( get_option( 'promo_pop_end' ) );
+    $today_time = strtotime('today');
+
+    if ( $promo_start && $promo_end && ($today_time > $promo_start && $today_time < $promo_end) ) {
+        $time_run = true
+    } 
+    elseif ($promo_start && !$promo_end && ($today_time > $promo_start) ) {
+        $time_run = true
+    }
+    elseif (!$promo_start && $promo_end && ($today_time < $promo_end) ) {
+        $time_run = true
+    } 
+    elseif (!$promo_start && !$promo_end) {
+        $time_run = true;
+        // no time set, always run
+    } 
+    else {
+        $time_run = false;
+    }
+
+    // this function returns true if the promo should show on the current post
+
+    // accesses global post to test against options
+    global $post;
+
+    // gathers relevant options
+    $dev_mode_active = get_option( 'promo_pop_developer_mode') !== '' ? true : false;
+    $promo_pop_active = get_option( 'promo_pop_active' ) !== '' ? true : false;
+    $cookie_block_popup = isset($_COOKIE['promo-pop-closed']);
+    $page_array = get_option( 'promo_pop_page_array' );
+    $post_type_array = get_option( 'promo_pop_post_type_array' );
+    $page_array_type = get_option( 'promo_pop_page_array_type' );
+
+    // generates state variables
+    $is_page = ($post->post_type == "page" ? true : false);
+    $in_page_array = ( strPos( $page_array, strval($post->ID) ) !== false ? true : false );
+    $is_valid_post = ( strPos( $post_type_array, $post->post_type ) !== false ? true : false );
+    
+    // logic tested against state
+    if ( (!$cookie_block_popup && $promo_pop_active && $time_run) || ($dev_mode_active && is_user_logged_in()) ) {
+        if ($is_page) {
+            if ( $page_array_type === 'include' && $in_page_array ) {
+                return true;
+            }
+            else if ($page_array_type === 'exclude' && !$in_page_array ) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        } elseif ($is_valid_post) {
+            return true;
+        } else {
+            return false;
+        }
+    } 
+    else {
+        return false;
+    } 
+
+
+}
+
 ?>
