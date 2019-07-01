@@ -391,13 +391,13 @@ function promo_pop_post_show_promo() {
     $today_time = strtotime('today');
 
     if ( $promo_start && $promo_end && ($today_time > $promo_start && $today_time < $promo_end) ) {
-        $time_run = true
+        $time_run = true;
     } 
     elseif ($promo_start && !$promo_end && ($today_time > $promo_start) ) {
-        $time_run = true
+        $time_run = true;
     }
     elseif (!$promo_start && $promo_end && ($today_time < $promo_end) ) {
-        $time_run = true
+        $time_run = true;
     } 
     elseif (!$promo_start && !$promo_end) {
         $time_run = true;

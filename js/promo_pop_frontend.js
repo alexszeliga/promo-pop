@@ -6,45 +6,35 @@
   console.log(detail);
   console.log(options);
 
-var now = parseInt(options.now);
-var start = parseInt(options.start);
-var end = parseInt(options.end);
+// var now = parseInt(options.now);
+// var start = parseInt(options.start);
+// var end = parseInt(options.end);
 
-var promoIsCurrent = false;
-if (now > start && now <= end) {
-  promoIsCurrent = true;
-}
-var promoIsActive = false;
-if (options.active === "on") {
-  promoIsActive = true;
-}
-var devMode = false;
-if ( options.dev_mode === "on" ) {
-  devMode = true;
-}
-var userLoggedIn = false;
-if ( options.logged_in === "1" ) {
-  userLoggedIn = true;
-}
-var pagesToFilter = options.page_array.split(",");
-var filterMethod = options.page_array_type;
-var thisPostType = detail.post.post_type;
-var thisPostId = detail.post.ID;
+// var promoIsCurrent = false;
+// if (now > start && now <= end) {
+//   promoIsCurrent = true;
+// }
+// var promoIsActive = false;
+// if (options.active === "on") {
+//   promoIsActive = true;
+// }
+// var devMode = false;
+// if ( options.dev_mode === "on" ) {
+//   devMode = true;
+// }
+// var userLoggedIn = false;
+// if ( options.logged_in === "1" ) {
+//   userLoggedIn = true;
+// }
+// var pagesToFilter = options.page_array.split(",");
+// var filterMethod = options.page_array_type;
+// var thisPostType = detail.post.post_type;
+// var thisPostId = detail.post.ID;
 var pluginDir = detail.plugin_dir;
 var popDelay = 1000;
-var cookieState = Cookies.get("promo-pop-closed");
+// var cookieState = Cookies.get("promo-pop-closed");
 
-if (
-   (devMode && userLoggedIn && ((pagesToFilter.indexOf(thisPostId) >= 0 && filterMethod === "include") ||
-(pagesToFilter.indexOf(thisPostId) === -1 &&
-  filterMethod === "exclude"))) ||
-  (((pagesToFilter.indexOf(thisPostId) >= 0 && filterMethod === "include") ||
-    (pagesToFilter.indexOf(thisPostId) === -1 &&
-      filterMethod === "exclude")) &&
-  !cookieState &&
-  promoIsCurrent &&
-  promoIsActive)
-) {
+
   promoBanner = $('<div class="promo_pop_container">');
 
   closeButton = $(
@@ -84,7 +74,7 @@ if (
   setTimeout(function() {
     promoBanner.css({ bottom: 0, opacity: 1 });
   }, popDelay);
-}
+
 $("body").on("click", "#promo_pop_close", function(e) {
   // console.log("clicked close");
   Cookies.set("promo-pop-closed", "1", { expires: 1 });
