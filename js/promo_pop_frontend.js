@@ -3,59 +3,47 @@
 // details contains all relevant post/page details.
 
 (function($) {
-  console.log(detail);
-  console.log(options);
+  // console.log(detail);
+  // console.log(options);
 
-// var now = parseInt(options.now);
-// var start = parseInt(options.start);
-// var end = parseInt(options.end);
+  var pluginDir = detail.plugin_dir;
+  var popDelay = 1000;
 
-// var promoIsCurrent = false;
-// if (now > start && now <= end) {
-//   promoIsCurrent = true;
-// }
-// var promoIsActive = false;
-// if (options.active === "on") {
-//   promoIsActive = true;
-// }
-// var devMode = false;
-// if ( options.dev_mode === "on" ) {
-//   devMode = true;
-// }
-// var userLoggedIn = false;
-// if ( options.logged_in === "1" ) {
-//   userLoggedIn = true;
-// }
-// var pagesToFilter = options.page_array.split(",");
-// var filterMethod = options.page_array_type;
-// var thisPostType = detail.post.post_type;
-// var thisPostId = detail.post.ID;
-var pluginDir = detail.plugin_dir;
-var popDelay = 1000;
-// var cookieState = Cookies.get("promo-pop-closed");
+  var promoBanner = $('<div class="promo_pop_container">');
 
-
-  promoBanner = $('<div class="promo_pop_container">');
-
-  closeButton = $(
-    '<div data-promo-name="' + options.title + '" class="promo_pop_close" name="close_promo" id="promo_pop_close">'
+  var closeButton = $(
+    '<div data-promo-name="' +
+      options.title +
+      '" class="promo_pop_close" name="close_promo" id="promo_pop_close">'
   );
 
-  closeButtonImg = $(
+  var closeButtonImg = $(
     '<img src="' +
       pluginDir +
-      'assets/img/close-ui-2.gif" class="promo_pop_close close_button_img" data-promo-name="' + options.title + '" href="' + options.url + '">'
+      'assets/img/close-ui-2.gif" class="promo_pop_close close_button_img" data-promo-name="' +
+      options.title +
+      '" href="' +
+      options.url +
+      '">'
   );
   closeButton.append(closeButtonImg);
-  promoImage = $(
+  var promoImage = $(
     '<img src="' + options.body_image + '" id="promo_pop_image">'
   );
-  promoRelContent = $('<div id="promo_rel_box">');
-  promoFlexContent = $('<a data-promo-name="' + options.title + '" href="' + options.url + '" target="_blank" id="promo_flexbox">');
-  promoCopyContainer = $('<div class="promo_copy" data-promo-name="' + options.title + '">');
-  promoCopyContainerLink = $('<div>' )
-  promoTopCopy = $('<p class="promo_headline">' + options.title + "</p>");
-  promoBottomCopy = $(
+  var promoRelContent = $('<div id="promo_rel_box">');
+  var promoFlexContent = $(
+    '<a data-promo-name="' +
+      options.title +
+      '" href="' +
+      options.url +
+      '" target="_blank" id="promo_flexbox">'
+  );
+  var promoCopyContainer = $(
+    '<div class="promo_copy" data-promo-name="' + options.title + '">'
+  );
+  // promoCopyContainerLink = $('<div>' )
+  var promoTopCopy = $('<p class="promo_headline">' + options.title + "</p>");
+  var promoBottomCopy = $(
     '<p id="promo_pop_link" class="promo_link promo_pop_link">' +
       options.cta_label +
       "</p>"
@@ -75,9 +63,9 @@ var popDelay = 1000;
     promoBanner.css({ bottom: 0, opacity: 1 });
   }, popDelay);
 
-$("body").on("click", "#promo_pop_close", function(e) {
-  // console.log("clicked close");
-  Cookies.set("promo-pop-closed", "1", { expires: 1 });
-  promoBanner.css({ bottom: -baseHeight, opacity: 0 });
-});
+  $("body").on("click", "#promo_pop_close", function(e) {
+    // console.log("clicked close");
+    Cookies.set("promo-pop-closed", "1", { expires: 1 });
+    promoBanner.css({ bottom: -baseHeight, opacity: 0 });
+  });
 })(jQuery);
